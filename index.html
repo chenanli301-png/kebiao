@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英语(专升本)2601班 课表</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --line: #e5e7eb;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --accent: #4f46e5;
+    --accent-soft: #eef2ff;
+    --today: #fef3c7;
+    --today-border: #f59e0b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 16px;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 16px; }
+  header h1 { font-size: 22px; font-weight: 700; }
+  header .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  .toolbar {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+    position: sticky;
+    top: 8px;
+    z-index: 10;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  }
+  .toolbar button {
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: .15s;
+  }
+  .toolbar button:hover { background: var(--accent-soft); border-color: var(--accent); }
+  .toolbar button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .toolbar button.primary:hover { filter: brightness(1.08); }
+  .toolbar select {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 14px;
+    background: var(--card);
+    cursor: pointer;
+  }
+  .toolbar .datebox { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+  .toolbar .datebox input { border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; font-size: 13px; }
+
+  .now-info {
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .now-info b { color: var(--accent); font-size: 16px; }
+
+  .table-scroll { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+  table { border-collapse: collapse; width: 100%; min-width: 860px; }
+  th, td { border: 1px solid var(--line); vertical-align: top; }
+  thead th {
+    background: #f9fafb;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 6px;
+    text-align: center;
+  }
+  thead th.period-col { width: 70px; }
+  td.period-cell {
+    text-align: center;
+    background: #f9fafb;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 10px 4px;
+    white-space: nowrap;
+  }
+  td.period-cell .t { font-weight: 600; color: var(--text); font-size: 13px; }
+  td.course-cell { padding: 6px; min-width: 118px; min-height: 64px; }
+  td.today { background: var(--today); }
+  thead th.today { background: var(--today); color: #92400e; }
+
+  .course {
+    border-radius: 8px;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+    font-size: 12.5px;
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+  }
+  .course:last-child { margin-bottom: 0; }
+  .course .cname { font-weight: 600; font-size: 13px; }
+  .course .meta { color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+  .course .loc { color: #4b5563; font-size: 11.5px; margin-top: 2px; }
+  .course.alt { border-left-color: #059669; background: #ecfdf5; }
+  .empty { color: #c4c7cc; text-align: center; font-size: 12px; padding: 8px 0; }
+
+  .legend { margin-top: 14px; font-size: 12px; color: var(--muted); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+  .legend h3 { font-size: 13px; color: var(--text); margin-bottom: 6px; }
+  .legend ul { padding-left: 18px; }
+  .legend li { margin: 3px 0; }
+
+  footer { text-align: center; color: #9ca3af; font-size: 12px; margin-top: 16px; }
+
+  @media (max-width: 640px) {
+    body { padding: 8px; }
+    header h1 { font-size: 18px; }
+    .toolbar { position: static; }
+    .toolbar .datebox { margin-left: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>英语(专升本)2601班 课程表</h1>
+    <div class="sub">文法学院 · 英语(专升本) · 2026-2027学年第一学期</div>
+  </header>
+
+  <div class="toolbar">
+    <button id="prevWeek">‹ 上一周</button>
+    <select id="weekSelect" title="选择周次"></select>
+    <button id="nextWeek">下一周 ›</button>
+    <button id="thisWeek" class="primary">回到本周</button>
+    <div class="datebox">
+      <span>第1周周一</span>
+      <input type="date" id="weekStart" value="2026-09-14">
+    </div>
+  </div>
+
+  <div class="now-info">
+    正在显示：第 <b id="curWeekLabel">1</b> 周
+    （<span id="weekRangeLabel"></span>）
+  </div>
+
+  <div class="table-scroll">
+    <table id="schedule">
+      <thead>
+        <tr id="headRow"></tr>
+      </thead>
+      <tbody id="bodyRows"></tbody>
+    </table>
+  </div>
+
+  <div class="legend">
+    <h3>说明</h3>
+    <ul>
+      <li>数据来自课表截图 OCR 识别，<b>老师姓名、个别周次可能不准确</b>，请对照原图核对（详见「数据核对清单.md」）。</li>
+      <li>周次标记：<b>[10]</b> = 仅第10周；<b>[1-10]</b> = 第1到10周；<b>[5-12]单</b> = 第5到12周中的单周。</li>
+      <li>节次时间按常见安排标注，仅供参考，以学校实际为准。</li>
+      <li>黄色列 = 今天；「回到本周」按下方开学日期自动计算（第1周周一 = 2026-09-14）。</li>
+    </ul>
+  </div>
+
+  <footer>郑州工商学院 · 文法学院 · 英语(专升本)2601班</footer>
+</div>
+
+<script>
+// ===== 课程数据 =====
+// day: 1周一~7周日；period: 1~5 对应 1-2节~9-10节
+// weeks: "10"=仅第10周, "1-10"=第1~10周, "5-12单"=第5~12周单周, "1-8,10-16单"=多段单周
+const COURSES = [
+  // 英国文学 李敏
+  {name:"英国文学", teacher:"李敏", day:1, period:1, weeks:"1-10", loc:"3号教学楼22420"},
+  {name:"英国文学", teacher:"李敏", day:1, period:1, weeks:"12-16", loc:"3号教学楼22420"},
+  {name:"英国文学", teacher:"李敏", day:4, period:1, weeks:"10", loc:"3号教学楼22420"},
+  // 形势与政策 华桂鹳
+  {name:"形势与政策", teacher:"华桂鹳", day:2, period:1, weeks:"5-12单", loc:"3号教学楼212"},
+  // 高级英语 I 赵东方
+  {name:"高级英语 I", teacher:"赵东方", day:2, period:1, weeks:"14", loc:"3号教学楼30330"},
+  {name:"高级英语 I", teacher:"赵东方", day:3, period:1, weeks:"1-10", loc:"3号教学楼30430"},
+  {name:"高级英语 I", teacher:"赵东方", day:3, period:1, weeks:"13-16", loc:"3号教学楼30430"},
+  {name:"高级英语 I", teacher:"赵东方", day:4, period:1, weeks:"13", loc:"3号教学楼30330"},
+  {name:"高级英语 I", teacher:"赵东方", day:5, period:1, weeks:"1-10", loc:"3号教学楼30430"},
+  {name:"高级英语 I", teacher:"赵东方", day:5, period:1, weeks:"13-16", loc:"3号教学楼30430"},
+  {name:"高级英语 I", teacher:"赵东方", day:5, period:3, weeks:"13", loc:"3号教学楼30430"},
+  {name:"高级英语 I", teacher:"赵东方", day:3, period:5, weeks:"14", loc:"3号教学楼30430"},
+  // 英语课程与教学论 顾雪
+  {name:"英语课程与教学论", teacher:"顾雪", day:1, period:2, weeks:"1-10", loc:"综合实验楼一区601(外语虚拟仿真实验室)"},
+  {name:"英语课程与教学论", teacher:"顾雪", day:1, period:2, weeks:"12-16", loc:"综合实验楼一区601(外语虚拟仿真实验室)"},
+  {name:"英语课程与教学论", teacher:"顾雪", day:2, period:5, weeks:"10", loc:"综合实验楼一区601(外语虚拟仿真实验室)"},
+  // 英汉互译 I 王倩
+  {name:"英汉互译 I", teacher:"王倩", day:3, period:2, weeks:"1-10", loc:"3号教学楼22420"},
+  {name:"英汉互译 I", teacher:"王倩", day:3, period:2, weeks:"12-16", loc:"3号教学楼22420"},
+  {name:"英汉互译 I", teacher:"王倩", day:1, period:4, weeks:"10", loc:"3号教学楼22320"},
+  // 第二外语 I 许媛
+  {name:"第二外语 I", teacher:"许媛", day:4, period:2, weeks:"1-10", loc:"3号教学楼30430"},
+  {name:"第二外语 I", teacher:"许媛", day:4, period:2, weeks:"13-16", loc:"3号教学楼30430"},
+  {name:"第二外语 I", teacher:"许媛", day:3, period:5, weeks:"9", loc:"3号教学楼30430"},
+  {name:"第二外语 I", teacher:"许媛", day:3, period:5, weeks:"10", loc:"3号教学楼30430"},
+  // 语言学导论 赫倩倩
+  {name:"语言学导论", teacher:"赫倩倩", day:4, period:3, weeks:"1-10", loc:"3号教学楼30920"},
+  {name:"语言学导论", teacher:"赫倩倩", day:4, period:3, weeks:"12-16", loc:"3号教学楼30920"},
+  {name:"语言学导论", teacher:"赫倩倩", day:4, period:5, weeks:"10", loc:"3号教学楼30920"},
+  // 笔译实训 I 李峥
+  {name:"笔译实训 I", teacher:"李峥", day:5, period:3, weeks:"1-8", loc:"综合实验楼一区616(数字语音实训室)"},
+  // 习近平新时代中国特色社会主义思想概论 叶莹莹
+  {name:"习近平新时代中国特色社会主义思想概论", teacher:"叶莹莹", day:1, period:3, weeks:"1-16", loc:"3号教学楼21230"},
+  {name:"习近平新时代中国特色社会主义思想概论", teacher:"叶莹莹", day:5, period:2, weeks:"1-8,10-16单", loc:"3号教学楼20830"},
+  {name:"习近平新时代中国特色社会主义思想概论", teacher:"叶莹莹", day:5, period:2, weeks:"9", loc:"精神谱系馆30"},
+  // 中原文化国际传播
+  {name:"中原文化国际传播", teacher:"曹智博", day:2, period:2, weeks:"1-8", loc:"3号教学楼113(中华文化沉浸式多语教学实验室)"},
+  {name:"中原文化国际传播", teacher:"周思晗", day:2, period:2, weeks:"9-10", loc:"3号教学楼113(中华文化沉浸式多语教学实验室)"},
+  {name:"中原文化国际传播", teacher:"周思晗", day:2, period:2, weeks:"12-16", loc:"3号教学楼113(中华文化沉浸式多语教学实验室)"},
+  {name:"中原文化国际传播", teacher:"周思晗", day:1, period:5, weeks:"10", loc:"3号教学楼113(中华文化沉浸式多语教学实验室)"},
+  // 跨境电子商务实务
+  {name:"跨境电子商务实务", teacher:"马宁", day:3, period:3, weeks:"1-8", loc:"综合实验楼一区610(AI语伴听说技能实训室)"},
+  {name:"跨境电子商务实务", teacher:"李姣姣", day:3, period:3, weeks:"9-10", loc:"综合实验楼一区610(AI语伴听说技能实训室)"},
+  {name:"跨境电子商务实务", teacher:"李姣姣", day:3, period:3, weeks:"12-16", loc:"综合实验楼一区610(AI语伴听说技能实训室)"},
+  {name:"跨境电子商务实务", teacher:"李姣姣", day:4, period:4, weeks:"10", loc:"综合实验楼一区610(AI语伴听说技能实训室)"},
+];
+
+const DAYS = ["周一","周二","周三","周四","周五","周六","周日"];
+const PERIODS = [
+  {name:"1-2节", time:"08:00-09:40"},
+  {name:"3-4节", time:"10:00-11:40"},
+  {name:"5-6节", time:"14:00-15:40"},
+  {name:"7-8节", time:"16:00-17:40"},
+  {name:"9-10节", time:"19:00-20:40"},
+];
+
+// 解析周次字符串 -> 周次数组
+// 支持："10"(单周)、"1-10"(范围)、"5-12单"(范围取单周)、"1-8,10-16单"(多段)
+function parseWeeks(str) {
+  const odd = str.includes("单");
+  const clean = str.replace(/单/g, "");
+  const result = [];
+  for (const p of clean.split(",")) {
+    const m = p.match(/^(\d+)-(\d+)$/);
+    if (m) {
+      for (let i = +m[1]; i <= +m[2]; i++) {
+        if (!odd || i % 2 === 1) result.push(i);
+      }
+    } else if (/^\d+$/.test(p)) {
+      result.push(+p);
+    }
+  }
+  return result;
+}
+
+const COURSE_DATA = COURSES.map(c => ({...c, weekList: parseWeeks(c.weeks)}));
+
+let curWeek = 1;
+const weekStartInput = document.getElementById("weekStart");
+const weekSelect = document.getElementById("weekSelect");
+const headRow = document.getElementById("headRow");
+const bodyRows = document.getElementById("bodyRows");
+const curWeekLabel = document.getElementById("curWeekLabel");
+const weekRangeLabel = document.getElementById("weekRangeLabel");
+
+function computeThisWeek() {
+  const start = new Date(weekStartInput.value + "T00:00:00");
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diff = Math.floor((today - start) / 86400000);
+  return Math.max(1, Math.floor(diff / 7) + 1);
+}
+
+function fillWeekSelect() {
+  weekSelect.innerHTML = "";
+  for (let i = 1; i <= 16; i++) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = "第 " + i + " 周";
+    weekSelect.appendChild(opt);
+  }
+}
+
+function weekDateRange(week) {
+  const start = new Date(weekStartInput.value + "T00:00:00");
+  const monday = new Date(start.getTime() + (week - 1) * 7 * 86400000);
+  const sunday = new Date(monday.getTime() + 6 * 86400000);
+  const fmt = d => `${d.getMonth()+1}/${d.getDate()}`;
+  return `${fmt(monday)} ~ ${fmt(sunday)}`;
+}
+
+function render() {
+  curWeekLabel.textContent = curWeek;
+  weekRangeLabel.textContent = weekDateRange(curWeek);
+  weekSelect.value = curWeek;
+
+  headRow.innerHTML = "";
+  const th0 = document.createElement("th");
+  th0.className = "period-col";
+  th0.textContent = "节次";
+  headRow.appendChild(th0);
+  const todayIdx = (new Date().getDay() + 6) % 7; // 0=周一
+  DAYS.forEach((d, i) => {
+    const th = document.createElement("th");
+    th.textContent = d;
+    if (i === todayIdx) th.classList.add("today");
+    headRow.appendChild(th);
+  });
+
+  bodyRows.innerHTML = "";
+  PERIODS.forEach((p, pi) => {
+    const tr = document.createElement("tr");
+    const tdP = document.createElement("td");
+    tdP.className = "period-cell";
+    tdP.innerHTML = `<div class="t">${p.name}</div><div>${p.time}</div>`;
+    tr.appendChild(tdP);
+
+    DAYS.forEach((d, di) => {
+      const td = document.createElement("td");
+      td.className = "course-cell";
+      if (di === todayIdx) td.classList.add("today");
+
+      const list = COURSE_DATA.filter(c => c.day === di + 1 && c.period === pi + 1 && c.weekList.includes(curWeek));
+      if (list.length === 0) {
+        td.innerHTML = '<div class="empty">—</div>';
+      } else {
+        list.forEach((c, idx) => {
+          const div = document.createElement("div");
+          div.className = "course" + (idx > 0 ? " alt" : "");
+          div.innerHTML = `
+            <div class="cname">${c.name}</div>
+            <div class="meta">${c.teacher} · ${c.weeks}周</div>
+            <div class="loc">${c.loc}</div>`;
+          td.appendChild(div);
+        });
+      }
+      tr.appendChild(td);
+    });
+    bodyRows.appendChild(tr);
+  });
+}
+
+weekSelect.addEventListener("change", () => { curWeek = +weekSelect.value; render(); });
+document.getElementById("prevWeek").addEventListener("click", () => { if (curWeek > 1) curWeek--; render(); });
+document.getElementById("nextWeek").addEventListener("click", () => { if (curWeek < 16) curWeek++; render(); });
+document.getElementById("thisWeek").addEventListener("click", () => { curWeek = computeThisWeek(); render(); });
+weekStartInput.addEventListener("change", () => { curWeek = computeThisWeek(); render(); });
+
+fillWeekSelect();
+curWeek = computeThisWeek();
+render();
+</script>
+</body>
+</html>
